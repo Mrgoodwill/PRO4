@@ -9,7 +9,7 @@ Before starting make sure you have the following programs installed.
 
 Installation
 
-Clone this repository using:
+Clone this repository using:\n
 git clone https://github.com/Mrgoodwill/PRO4.git
 Navigate to the cloned directory using:
 cd PRO4
