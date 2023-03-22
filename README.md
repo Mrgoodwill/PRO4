@@ -1,5 +1,4 @@
 PRO4
-PRO4 is a Python web application that allows users to [insert description of what the app does].
 
 Installation
 
@@ -27,3 +26,11 @@ git config --global user.email "you@example.com"
 git config --global --add safe.directory /path/to/PRO4
 
 Make sure to replace "Your Name", "you@example.com", and "/path/to/PRO4" with your own name, email address, and the path to the PRO4 directory.
+
+If you are still having issues, try setting the SSH URL for your Git remote manually by running the command git remote set-url origin
+git@github.com:Mrgoodwill/PRO4.git (replace "Mrgoodwill" and "PRO4" with your own GitHub username and repository name).
+
+Check that your SSH key is being used by Git. To do this, run the command ssh -T git@github.com. This should return a message that starts with
+"Hi username! You've successfully authenticated...". If you see an error message instead, it means that your SSH key is not being used by Git.
+
+
