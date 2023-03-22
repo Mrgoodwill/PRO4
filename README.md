@@ -3,9 +3,10 @@ PRO4
 Prerequisites
 
 Before starting make sure you have the following programs installed.
-* Git
-* Docker
-* Pip
+* git
+* docker
+* pip
+* python3-virtualenv
 
 Installation
 
