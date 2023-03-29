@@ -12,7 +12,7 @@ Installation
 
 Clone this repository using:
 ```
-git clone https://github.com/Mrgoodwill/PRO4.git
+git clone https://github.com/VladimirFogel/PRO4.git
 ```
 Navigate to the cloned directory using:
 ```
