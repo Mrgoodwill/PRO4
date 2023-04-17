@@ -9,8 +9,8 @@ def create_ssh_connection(hostname, port, username, password):
 # Use "localhost" or "127.0.0.1" as the hostname to connect to the local SSH server
 hostname = "localhost"
 port = 22
-username = "vova"
-password = "3228"
+username = "Username"
+password = "Password"
 
 # Create a connection
 ssh = create_ssh_connection(hostname, port, username, password)
