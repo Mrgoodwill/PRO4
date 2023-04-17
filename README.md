@@ -28,7 +28,7 @@ Start the application using:
 ```
 python app.py
 ```
-Open your web browser and go to http://localhost:5000
+Open your web browser and go to http://localhost:8000
 
 Dockerization
 
