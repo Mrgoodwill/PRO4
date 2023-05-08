@@ -68,3 +68,6 @@ This should return a message that starts with
 
 Zeitdokumentation:
 * https://docs.google.com/spreadsheets/d/1mwbqgdCWlFgcgNUbmIdQwrI29UEeELdBSZa5vNcmR4U/edit?usp=sharing
+
+Jira Board:
+* https://pro4projektmanagement.atlassian.net/jira/software/projects/PRO4/boards/1
