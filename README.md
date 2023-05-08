@@ -71,3 +71,6 @@ Zeitdokumentation:
 
 Jira Board:
 * https://pro4projektmanagement.atlassian.net/jira/software/projects/PRO4/boards/1
+
+SSH Schwachstellen Template:
+* https://forms.gle/CfSYcY2WqVsZDadf7
