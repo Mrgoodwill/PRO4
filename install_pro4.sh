@@ -1,17 +1,13 @@
 #!/bin/bash
 
+#Execute only in the PRO4 folder
+
 # Update system
 sudo apt-get update
 sudo apt-get upgrade -y
 
 # Install prerequisites
 sudo apt-get install -y git docker.io python3-pip python3-venv
-
-# Clone repository
-git clone https://github.com/VladimirFogel/PRO4.git
-
-# Navigate to the cloned directory
-cd PRO4
 
 # Install required packages
 pip install --upgrade pip
