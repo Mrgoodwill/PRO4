@@ -1,47 +1,48 @@
-# ssh_server.py
 import socket
 import paramiko
 import threading
+import subprocess
 
-# Update these variables with your server's IP and port
-HOST = '127.0.0.1'
-PORT = 2222
-
-# Update these variables with the desired username and password
-USERNAME = 'your_username'
-PASSWORD = 'your_password'
-
-class Server(paramiko.ServerInterface):
-    def check_auth_password(self, username, password):
-        if username == USERNAME and password == PASSWORD:
-            return paramiko.AUTH_SUCCESSFUL
-        return paramiko.AUTH_FAILED
+class Server (paramiko.ServerInterface):
+    def __init__(self):
+        self.event = threading.Event()
 
     def check_channel_request(self, kind, chanid):
         if kind == 'session':
             return paramiko.OPEN_SUCCEEDED
         return paramiko.OPEN_FAILED_ADMINISTRATIVELY_PROHIBITED
 
-def handle_client(client_socket):
-    transport = paramiko.Transport(client_socket)
-    transport.add_server_key(paramiko.RSAKey.generate(1024))
-    transport.start_server(server=Server())
+    def check_auth_password(self, username, password):
+        if (username == 'username') and (password == 'password'):
+            return paramiko.AUTH_SUCCESSFUL
+        return paramiko.AUTH_FAILED
 
-    channel = transport.accept(20)
-    if channel is not None:
-        channel.exec_command("echo 'Hello, Paramiko!'")
+    def check_channel_exec_request(self, channel, command):
+        output = subprocess.check_output(command, shell=True)
+        channel.send(output)
+        channel.send_exit_status(0)
+        return True
 
-    transport.close()
 
-if __name__ == '__main__':
-    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    server.bind((HOST, PORT))
-    server.listen(1)
-    print(f'Listening for connections on {HOST}:{PORT}')
+ssh_host = 'localhost'
+ssh_port = 2222
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server.bind((ssh_host, ssh_port))
+server.listen(100)
 
-    while True:
-        client_socket, addr = server.accept()
-        print(f'Connection from {addr}')
-        client_thread = threading.Thread(target=handle_client, args=(client_socket,))
-        client_thread.start()
+print('Server started. Waiting for connections...')
+
+while True:
+    client, addr = server.accept()
+    print(f'Got a connection from {addr}.')
+    transport = paramiko.Transport(client)
+    transport.add_server_key(paramiko.RSAKey(filename='test_rsa.key'))
+    server = Server()
+    try:
+        transport.start_server(server=server)
+        print('SSH negotiation started.')
+    except paramiko.SSHException:
+        print('SSH negotiation failed.')
+        continue
+    chan = transport.accept(20)
+    print('Channel accepted.')
