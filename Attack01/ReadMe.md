@@ -43,5 +43,5 @@ the actual server.
 The server should print out on the client side: This is the Attacker Server.
 
 In a real life attack the attacker would obviously not change the IP the client connects to 
-but would perform are MitM attack with ARP Spoofing(Not possible in docker environment).
+but would perform a MitM attack with ARP Spoofing(Not possible in docker environment).
 
