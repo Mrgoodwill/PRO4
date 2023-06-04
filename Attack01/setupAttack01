@@ -1,0 +1,213 @@
+#!/bin/bash
+
+#Stopping all docker to delete them
+docker stop paramiko_server || true
+docker stop paramiko_client || true
+docker stop paramiko_attacker || true
+
+# Deleting existing docker
+docker rm paramiko_server || true
+docker rm paramiko_client || true
+docker rm paramiko_attacker || true
+
+
+
+# Creating the docker Network
+docker network create paramiko_network
+
+# Dockerfile to create the image
+cat > Dockerfile <<EOF
+FROM ubuntu:latest
+
+RUN apt-get update && \
+    apt-get install -y python3-pip
+
+RUN pip3 install paramiko
+EOF
+
+# Creating docker image
+docker build -t paramiko_image .
+
+# Start the docker container
+docker run -d --network paramiko_network --name paramiko_server paramiko_image tail -f /dev/null
+docker run -d --network paramiko_network --name paramiko_client paramiko_image tail -f /dev/null
+docker run -d --network paramiko_network --name paramiko_attacker paramiko_image tail -f /dev/null
+docker cp test_rsa.key paramiko_server:/test_rsa.key
+
+
+# Creating the server script
+cat > server.py <<EOF
+import paramiko
+import socket
+import threading
+import subprocess
+
+class SSHServer (paramiko.ServerInterface):
+    def __init__(self):
+        self.event = threading.Event()
+
+    def check_channel_request(self, kind, chanid):
+        if kind == 'session':
+            return paramiko.OPEN_SUCCEEDED
+        return paramiko.OPEN_FAILED_ADMINISTRATIVELY_PROHIBITED
+
+    def check_auth_password(self, username, password):
+        if (username == 'username') and (password == 'password'):
+            return paramiko.AUTH_SUCCESSFUL
+        return paramiko.AUTH_FAILED
+
+    def check_channel_exec_request(self, channel, command):
+        output = subprocess.check_output(command, shell=True)
+        channel.send(output)
+        channel.send_exit_status(0)
+        return True
+
+
+ssh_host = "0.0.0.0"
+ssh_port = 2222
+sock_server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+sock_server.bind((ssh_host, ssh_port))
+sock_server.listen(100)
+
+print('Server started. Waiting for connections...')
+
+while True:
+    client, addr = sock_server.accept()
+    print(f'Got a connection from {addr}.')
+    transport = paramiko.Transport(client)
+    transport.add_server_key(paramiko.RSAKey(filename='test_rsa.key'))
+    ssh_server = SSHServer()
+    try:
+        transport.start_server(server=ssh_server)
+        print('SSH negotiation started.')
+    except paramiko.SSHException:
+        print('SSH negotiation failed.')
+        continue
+    chan = transport.accept(20)
+    print('Channel accepted.')
+    chan.send("This is the real server.\n")
+
+EOF
+
+
+# Creating the client script
+cat > client.py <<EOF
+import paramiko
+import time
+import socket
+
+# Create an SSH client
+ssh = paramiko.SSHClient()
+ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+
+# Connect to the SSH server
+connected = False
+while not connected:
+    try:
+        ssh.connect("paramiko_server", username='username', password='password', port=2222)
+        connected = True
+    except paramiko.ssh_exception.NoValidConnectionsError:
+        print("Failed to connect, waiting for 5 seconds before retrying...")
+        time.sleep(5)
+
+# Execute a command on the server
+stdin, stdout, stderr = ssh.exec_command('ls')
+
+# Set the timeout
+stdout.channel.settimeout(2.0)
+
+# Read and print the output of the command
+try:
+    while True:
+        line = stdout.channel.recv(1024).decode()
+        if not line:
+            break
+        print(line, end='')
+except socket.timeout:
+    print("No more data.")
+
+
+# Countdown and automatic disconnection
+countdown = 15
+while countdown > 0:
+    print(f"{countdown} seconds until the connection terminates")
+    time.sleep(1)
+    countdown -= 1
+
+# Close the session and the channel
+stdout.channel.close()
+stdin.close()
+
+# Close the SSH connection
+ssh.close()
+EOF
+
+# Create the attacker script
+cat > attacker.py <<EOF
+
+import socket
+import paramiko
+import threading
+import subprocess
+
+class AttackerServer(paramiko.ServerInterface):
+    def __init__(self):
+        self.event = threading.Event()
+
+    def check_channel_request(self, kind, chanid):
+        if kind == 'session':
+            return paramiko.OPEN_SUCCEEDED
+        return paramiko.OPEN_FAILED_ADMINISTRATIVELY_PROHIBITED
+
+    def check_auth_password(self, username, password):
+        # Accepting every Username/Password
+        return paramiko.AUTH_SUCCESSFUL
+
+    def check_channel_exec_request(self, channel, command):
+        output = subprocess.check_output(command, shell=True)
+        channel.send(output)
+        channel.send_exit_status(0)
+        return True
+
+
+ssh_host = '0.0.0.0'
+ssh_port = 2223
+server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server_socket.bind((ssh_host, ssh_port))  
+server_socket.listen(100) 
+
+print('Attacker server started. Waiting for connections...')
+
+while True:
+    client, addr = server_socket.accept() 
+    print(f'Got a connection from {addr}.')
+    transport = paramiko.Transport(client)
+    transport.add_server_key(paramiko.RSAKey.generate(bits=2048)) 
+    server = AttackerServer()
+    try:
+        transport.start_server(server=server)
+        print('SSH negotiation started.')
+    except paramiko.SSHException:
+        print('SSH negotiation failed.')
+        continue
+    chan = transport.accept(20)
+    print('Channel accepted.')
+    chan.send("This is the Attacker server.\n")
+
+
+EOF
+
+# Making the scripts executables
+chmod +x server.py
+chmod +x client.py
+chmod +x attacker.py
+
+# Coyping scripts into the container
+docker cp server.py paramiko_server:/server.py
+docker cp client.py paramiko_client:/client.py
+docker cp attacker.py paramiko_attacker:/attacker.py
+
+# Executing the scripts - not working automated. 
+#docker exec -d paramiko_server python3 /server.py
+#docker exec -d paramiko_client python3 /client.py
+#docker exec -d paramiko_attacker python3 /attacker.py
