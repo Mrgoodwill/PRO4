@@ -56,12 +56,13 @@ ssh -T git@github.com
 This should return a message that starts with
 "Hi username! You've successfully authenticated...". If you see an error message instead, it means that your SSH key is not being used by Git.
 
+## External Links
 
-Zeitdokumentation:
+### Zeitdokumentation:
 * https://docs.google.com/spreadsheets/d/1mwbqgdCWlFgcgNUbmIdQwrI29UEeELdBSZa5vNcmR4U/edit?usp=sharing
 
-Jira Board:
+### Jira Board:
 * https://pro4projektmanagement.atlassian.net/jira/software/projects/PRO4/boards/1
 
-SSH Schwachstellen Template:
+### SSH Schwachstellen Template:
 * https://forms.gle/CfSYcY2WqVsZDadf7
