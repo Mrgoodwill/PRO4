@@ -1,14 +1,13 @@
-PRO4
+# PRO4 - SSH Playground
 
-Prerequisites
+## Prerequisites
 
 Before starting make sure you have the following programs installed.
 * git
-* docker
 * pip
 * python3-virtualenv
 
-Installation
+## Installation
 
 Clone this repository using:
 ```
@@ -22,27 +21,19 @@ Install the required packages using:
 ```
 pip install -r requirements.txt
 ```
-Usage
 
-Start the application using:
-```
-python app.py
-```
-Open your web browser and go to http://localhost:8000
+## Table of Contents
++ Attack01 - AutoAdd Policy Attack
++ CVE-2018-10933 - LibSSH Attack
++ CVE-2018-7750 - Skip Authentication Attack
++ CVE-2018-1000805 - Authentication Bypass Attack
 
-Dockerization
+## Usage
 
-To run the application in a Docker container, follow these steps:
+Open the folder of the attack you want to simulate.
+Follow instructions for the attack given in the folder.
 
-Build the Docker image using:
-```
-docker build -t pro4 .
-```
-Run the Docker container using:
-```
-docker run -p 5000:5000 pro4
-```
-Note that you can replace pro4 with any name you want to give your Docker container.
+## Contribute
 
 To make sure that your Git commits are properly attributed to you, you should set your Git name, email, and safe directory using the following commands:
 ```
