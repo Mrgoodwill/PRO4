@@ -4,13 +4,13 @@
 
 ### Concept
 
-"setupAttack01" starts a docker container with 3 network participants. The real 
+"setupAttack" starts a docker container with 3 network participants. The real 
 server, the client and the attacker. The attacker accepts every username/password combination. 
 
 ### Preparation
 You can start the script by running this command: 
 ```
-sudo ./setupAttack01
+sudo ./setupAttack
 ```
 Now you created 3 Docker Containers which you can access by the following commands
 ```
@@ -40,7 +40,7 @@ ssh.connect("paramiko_attacker", username='username', password='password', port=
 ```
 Safe the file and start the script again:
 ```
-sudo ./setupAttack01
+sudo ./setupAttack
 ```
 Enter the paramiko_attacker and paramiko_client container and repeat the steps like before with
 the actual server.
