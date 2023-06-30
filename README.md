@@ -23,9 +23,9 @@ pip install -r requirements.txt
 ```
 
 ## Table of Contents
-+ CVE-2020-14145 - AutoAdd Policy Attack
-+ CVE-2018-10933 - LibSSH Attack
-+ CVE-2018-7750 - Skip Authentication Attack
++ CVE-2020-14145 -  AutoAdd Policy Attack
++ CVE-2018-10933 -  LibSSH Attack
++ CVE-2018-7750 -   Denial of Service Attack
 
 ## Usage
 
